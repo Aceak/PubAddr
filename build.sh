@@ -18,7 +18,7 @@ build() {
 
     # 捕获错误，不让 go build 的输出直接破坏脚本格式
     if ! GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o "$OUT" ./cmd/main.go 2>build_error.log; then
-        echo "[!] build $GOOS/$GOARCH$SUFFIX failed"
+        echo "[!] build pubaddr_$GOOS_$GOARCH$SUFFIX failed"
         echo "    $(cat build_error.log)"
         rm -f build_error.log
         exit 1

@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'   # 任何 v 开头的 tag，比如 v1.0.0
+      - 'v*'
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -24,6 +27,18 @@ jobs:
       - name: Make build.sh executable
         run: chmod +x build.sh
 
+      - name: Determine Tag
+        id: tag
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "tag_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "Using pushed tag: ${{ github.ref_name }}"
+          else
+            latest_tag=$(git describe --tags --abbrev=0)
+            echo "tag_name=$latest_tag" >> $GITHUB_OUTPUT
+            echo "Using latest tag: $latest_tag"
+          fi
+
       - name: Run Build Script
         run: ./build.sh
 
@@ -32,23 +47,21 @@ jobs:
           mkdir artifacts
           cp build/* artifacts/
 
-      # 创建 GitHub Release（草稿）
       - name: Create Draft Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          name: "Release ${{ steps.tag.outputs.tag_name }}"
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 上传构建的文件
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ steps.tag.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
