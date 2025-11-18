@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'   # 任何 v 开头的 tag，比如 v1.0.0
 
+permissions:
+  contents: write
+
 jobs:
   build-release:
     runs-on: ubuntu-latest
