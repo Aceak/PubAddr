@@ -1,6 +1,7 @@
 package limit
 
 import (
+	"PubAddr/internal/logger"
 	"sync"
 	"time"
 )
@@ -12,6 +13,7 @@ type Limiter struct {
 }
 
 func NewLimiter(window time.Duration) *Limiter {
+	logger.Debug("Initializing Limiter, window=%v", window)
 	return &Limiter{
 		lastSeen: make(map[string]time.Time),
 		window:   window,

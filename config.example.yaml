@@ -7,8 +7,7 @@ ip_header:
 
 security:
   access_token: "my-secret-token" # 带了正确 token 就免限流
-  rate_limit_per_ip: 1            # 每 IP 默认 1 秒 1 个请求
-  rate_duration: "5s"               # 限流时间窗口，默认 5 秒
+  rate_duration: "5s"             # 限流时间窗口，默认 5 秒
   enable_ua_block: true           # 是否启用 UA 屏蔽
   blocked_user_agents:            # 支持通配符的 UA 黑名单
     - "*curl*"

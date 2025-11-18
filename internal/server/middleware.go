@@ -6,7 +6,6 @@ import (
 	"PubAddr/internal/logger"
 	"PubAddr/internal/service"
 	"net/http"
-	"path"
 	"strings"
 )
 
@@ -59,13 +58,14 @@ func (m *MiddlewareManager) UABlock(next http.Handler) http.Handler {
 
 		if enable {
 			ua := strings.ToLower(strings.TrimSpace(r.UserAgent()))
+			clientIP := service.GetClientIP(r, m.cfg.IPHeader.TrustedRealIPHeader)
 
 			for _, pattern := range blockList {
-				pattern = strings.ToLower(strings.TrimSpace(pattern))
+				keyword := strings.ToLower(strings.TrimSpace(pattern))
 
 				// 使用 path.Match 来支持通配符 *, ? 等
-				matched, _ := path.Match(pattern, ua)
-				if matched {
+				if keyword != "" && strings.Contains(ua, keyword) {
+					logger.Debug("Blocked UA %s for IP %s", ua, clientIP)
 					w.WriteHeader(http.StatusForbidden)
 					return
 				}

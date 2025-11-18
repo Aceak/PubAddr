@@ -19,7 +19,6 @@ type IPHeaderConfig struct {
 
 type SecurityConfig struct {
 	AccessToken       string        `yaml:"access_token"`
-	RateLimitPerIP    int           `yaml:"rate_limit_per_ip"`
 	EnableUABlock     bool          `yaml:"enable_ua_block"`
 	RateDuration      time.Duration `yaml:"rate_duration"`
 	BlockedUserAgents []string      `yaml:"blocked_user_agents"`
@@ -53,10 +52,6 @@ func Load(path string) (*Config, error) {
 
 	if cfg.IPHeader.TrustedRealIPHeader == "" {
 		cfg.IPHeader.TrustedRealIPHeader = "X-Real-IP"
-	}
-
-	if cfg.Security.RateLimitPerIP <= 0 {
-		cfg.Security.RateLimitPerIP = 1
 	}
 
 	return &cfg, nil

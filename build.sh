@@ -5,6 +5,8 @@ set -e
 APP_NAME="pubaddr"
 BUILD_DIR="build"
 
+echo "[>] Starting cross compilation..."
+
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
@@ -14,13 +16,20 @@ build() {
     local SUFFIX=$3
     local OUT="$BUILD_DIR/${APP_NAME}-${GOOS}-${GOARCH}${SUFFIX}"
 
-    echo "[+] Building ${GOOS}/${GOARCH} ..."
-    GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o "$OUT" ./cmd/main.go
+    # 捕获错误，不让 go build 的输出直接破坏脚本格式
+    if ! GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o "$OUT" ./cmd/main.go 2>build_error.log; then
+        echo "[!] build $GOOS/$GOARCH$SUFFIX failed"
+        echo "    $(cat build_error.log)"
+        rm -f build_error.log
+        exit 1
+    fi
+
+    echo "[+] build $GOOS/$GOARCH$SUFFIX success"
 }
 
 ### Linux
 build linux amd64 ""
-build linux arm ""           # armv7
+build linux arm ""
 build linux arm64 ""
 build linux riscv64 ""
 
@@ -28,8 +37,8 @@ build linux riscv64 ""
 build windows amd64 ".exe"
 build windows arm64 ".exe"
 
-### macOS（不支持 riscv64）
+### macOS
 build darwin amd64 ""
 build darwin arm64 ""
 
-echo "[OK] All binaries are in $BUILD_DIR/"
+echo "[=] All targets compiled successfully"

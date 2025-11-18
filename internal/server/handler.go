@@ -19,7 +19,7 @@ func NewHandler(cfg *config.Config) *Handler {
 }
 
 func (h *Handler) handleGetIP(w http.ResponseWriter, r *http.Request) {
-	logger.Debug("Handling GET /ip request")
+	logger.Debug("Handling GET / request")
 	clientIP := service.GetClientIP(r, h.cfg.IPHeader.TrustedRealIPHeader)
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
