@@ -39,6 +39,19 @@ jobs:
             echo "Using latest tag: $latest_tag"
           fi
 
+      - name: Extract changelog for this tag
+        run: |
+          chmod +x script/extract_changelog.sh
+          {
+            echo "# Release Notes | 发布说明"
+            echo
+            script/extract_changelog.sh "${{ steps.tag.outputs.tag_name }}"
+          } > RELEASE_NOTE.md
+
+          echo "====== Extracted Release Notes ======"
+          cat RELEASE_NOTE.md
+          echo "====================================="
+
       - name: Run Build Script
         run: ./build.sh
 
@@ -52,9 +65,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
+          prerelease: false
           tag_name: ${{ steps.tag.outputs.tag_name }}
           name: "Release ${{ steps.tag.outputs.tag_name }}"
           generate_release_notes: true
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

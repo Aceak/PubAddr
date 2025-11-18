@@ -14,7 +14,7 @@ build() {
     local GOOS=$1
     local GOARCH=$2
     local SUFFIX=$3
-    local OUT="$BUILD_DIR/${APP_NAME}-${GOOS}-${GOARCH}${SUFFIX}"
+    local OUT="$BUILD_DIR/${APP_NAME}_${GOOS}_${GOARCH}${SUFFIX}"
 
     # 捕获错误，不让 go build 的输出直接破坏脚本格式
     if ! GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o "$OUT" ./cmd/main.go 2>build_error.log; then
@@ -24,7 +24,7 @@ build() {
         exit 1
     fi
 
-    echo "[+] build $GOOS/$GOARCH$SUFFIX success"
+    echo "[+] build pubaddr_${GOOS}_${GOARCH}${SUFFIX} success"
 }
 
 ### Linux
