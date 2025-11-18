@@ -1,9 +1,9 @@
-## v0.1.0 - 2025-11-18
-### 🚀 Initial Release | 初始版本
+# v0.1.0 - 2025-11-18
+## 🚀 Initial Release | 初始版本
 
 PubAddr 服务的第一个正式版本，提供了公网 IP 查询、限流、黑名单等核心能力。
 
-### ✨ Features | 功能特性
+## ✨ Features | 功能特性
 - Provide `/` 接口用于返回客户端公网 IP  
   提供根路径 `/` 作为公网 IP 查询接口
 - Provide `/health` 健康检查接口  
