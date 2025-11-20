@@ -51,7 +51,6 @@ jobs:
         run: |
           chmod +x script/extract_changelog.sh
           {
-            echo "# Release Notes | 发布说明"
             echo
             script/extract_changelog.sh "${{ steps.tag.outputs.tag_name }}"
           } > RELEASE_NOTE.md
