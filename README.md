@@ -77,15 +77,17 @@ go build -o pubaddr ./cmd/main.go
 
    ```ini
    [Unit]
-   Description=PubAddr Public IP Service
+   Description=PubAddr - Public IP Query Service
    After=network.target
 
    [Service]
-   ExecStart=/path/to/pubaddr_linux_amd64 --config /path/to/config.yaml
-   Restart=always
+   Type=simple
+   User=pubaddr
+   Group=pubaddr
+   WorkingDirectory=/path/to/pubaddr
+   ExecStart=/path/to/pubaddr/pubaddr --config /path/to/config.yaml
+   Restart=on-failure
    RestartSec=3
-   User=user
-   Group=user
 
    [Install]
    WantedBy=multi-user.target
