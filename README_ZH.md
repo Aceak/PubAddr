@@ -1,6 +1,6 @@
 # PubAddr
 
-<sub>[English Documentation](README_EN.md)</sub>
+<sub>[English Documentation](README.md)</sub>
 
 PubAddr 是一个轻量级的公网 IP 查询服务，旨在提供简单、高效、安全的 IP 地址查询功能。它可以部署在自己的服务器上，完全控制数据隐私，并且提供了丰富的安全特性，如 IP 限流、用户代理过滤和访问令牌认证。
 
