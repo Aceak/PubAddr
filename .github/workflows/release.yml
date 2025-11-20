@@ -31,12 +31,20 @@ jobs:
         id: tag
         run: |
           if [[ "${{ github.event_name }}" == "push" ]]; then
+            # 直接从 push 的 tag 获取
             echo "tag_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "Using pushed tag: ${{ github.ref_name }}"
           else
-            latest_tag=$(git describe --tags --abbrev=0)
+            # 手动触发则尝试自动获取最后一个 tag
+            latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || true)
+
+            if [[ -z "$latest_tag" ]]; then
+              echo "No tags found, fallback to v0.1.0"
+              latest_tag="v0.1.0"
+            fi
+
             echo "tag_name=$latest_tag" >> $GITHUB_OUTPUT
-            echo "Using latest tag: $latest_tag"
+            echo "Using tag: $latest_tag"
           fi
 
       - name: Extract changelog for this tag
@@ -60,22 +68,15 @@ jobs:
           mkdir artifacts
           cp build/* artifacts/
 
-      - name: Create Draft Release
-        id: create_release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           prerelease: false
           tag_name: ${{ steps.tag.outputs.tag_name }}
           name: "Release ${{ steps.tag.outputs.tag_name }}"
-          fail_on_unmatched_files: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
-        with:
+          body_path: RELEASE_NOTE.md
           files: artifacts/*
-          tag_name: ${{ steps.tag.outputs.tag_name }}
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
