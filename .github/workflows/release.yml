@@ -68,7 +68,6 @@ jobs:
           prerelease: false
           tag_name: ${{ steps.tag.outputs.tag_name }}
           name: "Release ${{ steps.tag.outputs.tag_name }}"
-          generate_release_notes: true
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
