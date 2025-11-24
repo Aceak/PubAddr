@@ -20,8 +20,8 @@ if [[ ! -f "$CHANGELOG_FILE" ]]; then
     exit 1
 fi
 
-awk -v version="# $VERSION " '
+awk -v version="## $VERSION " '
     index($0, version) == 1 {found=1; next}
-    found && /^# / {exit}
+    found && /^## / {exit}
     found
 ' "$CHANGELOG_FILE"
