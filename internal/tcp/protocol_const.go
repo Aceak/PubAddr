@@ -1,5 +1,7 @@
 package tcp
 
+import "fmt"
+
 // MagicHeader
 const (
 	MagicValue uint16 = 0xB1F1
@@ -34,3 +36,10 @@ const (
 
 // ResponseSize
 const ResponseSize = 8 // 响应包大小，固定为 8 字节
+
+var (
+	ErrMagic             = fmt.Errorf("invalid magic")
+	ErrVersion           = fmt.Errorf("invalid version")
+	ErrInvalidIP         = fmt.Errorf("invalid ip")
+	ErrRateLimitExceeded = fmt.Errorf("rate limit exceeded")
+)

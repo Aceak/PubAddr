@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"io"
 	"net"
 	"time"
 )
@@ -31,16 +32,11 @@ func (c *Client) GetIPv4(ctx context.Context) (string, error) {
 	}
 	defer conn.Close()
 
-	if err = c.sendRequest(conn); err != nil {
+	if err := c.sendRequest(conn); err != nil {
 		return "", err
 	}
 
-	ip, err := c.readResponse(conn)
-	if err != nil {
-		return "", err
-	}
-
-	return ip, nil
+	return c.readResponse(conn)
 }
 
 func (c *Client) dial(ctx context.Context) (net.Conn, error) {
@@ -61,59 +57,65 @@ func (c *Client) sendRequest(conn net.Conn) error {
 
 	binary.BigEndian.PutUint16(buf[3:5], OpcodeIPv4)
 
-	tokenBytes := []byte(c.token)
-	copy(buf[5:], tokenBytes)
+	copy(buf[5:], c.token)
 
 	_, err := conn.Write(buf)
 	return err
 }
 
 func (c *Client) readResponse(conn net.Conn) (string, error) {
-	head := make([]byte, 8)
+	resp := make([]byte, ResponseSize)
 
-	if !readFull(conn, head) {
+	if _, err := io.ReadFull(conn, resp); err != nil {
 		return "", ErrBadResponse
 	}
 
-	if binary.BigEndian.Uint16(head[:2]) != MagicValue {
+	if binary.BigEndian.Uint16(resp[:2]) != MagicValue {
 		return "", ErrMagic
 	}
 
-	if head[2] != VersionV1 {
+	if resp[2] != VersionV1 {
 		return "", ErrVersion
 	}
 
-	if head[3] != StatusOK {
-		return "", ErrStatus
+	status := resp[3]
+	if status != StatusOK {
+		return "", statusToErr(status)
 	}
 
-	rawIP := binary.BigEndian.Uint32(head[4:8])
-	ip := make(net.IP, net.IPv4len)
-	binary.BigEndian.PutUint32(ip, rawIP)
+	ipBytes := resp[4:8]
+	ip := net.IP(ipBytes).String()
 
-	s := ip.String()
-	if len(s) > 0 && len(s) < 64 {
-		return s, nil
+	if len(ip) == 0 || len(ip) > 64 {
+		return "", ErrInvalidIP
 	}
-	return "", ErrInvalidIP
-}
 
-func readFull(conn net.Conn, buf []byte) bool {
-	total := 0
-	for total < len(buf) {
-		n, err := conn.Read(buf[total:])
-		if err != nil {
-			return false
-		}
-		total += n
-	}
-	return true
+	return ip, nil
 }
 
 var (
-	ErrBadResponse = errors.New("pubaddr: bad response")
-	ErrMagic       = errors.New("pubaddr: invalid magic")
-	ErrVersion     = errors.New("pubaddr: invalid version")
-	ErrStatus      = errors.New("pubaddr: status error")
-	ErrInvalidIP   = errors.New("pubaddr: invalid ip")
+	ErrBadResponse    = errors.New("pubaddr: bad response")
+	ErrMagic          = errors.New("pubaddr: invalid magic")
+	ErrVersion        = errors.New("pubaddr: invalid version")
+	ErrStatus         = errors.New("pubaddr: status error")
+	ErrInvalidIP      = errors.New("pubaddr: invalid ip")
+	ErrUnauthorized   = errors.New("pubaddr: unauthorized (token invalid)")
+	ErrRateLimited    = errors.New("pubaddr: rate limited")
+	ErrInvalidRequest = errors.New("pubaddr: invalid request (opcode/magic/version)")
+	ErrServerError    = errors.New("pubaddr: server internal error")
 )
+
+func statusToErr(s uint8) error {
+	switch s {
+	case StatusUnauthorized:
+		return ErrUnauthorized
+	case StatusRateLimited:
+		return ErrRateLimited
+	case StatusInvalidRequest:
+		return ErrInvalidRequest
+	case StatusServerError:
+		return ErrServerError
+	default:
+		return ErrStatus
+	}
+}

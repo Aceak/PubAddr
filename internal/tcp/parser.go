@@ -17,28 +17,25 @@ type Header struct {
 
 func ParseHeader(conn net.Conn) (*Header, error) {
 
-	header := make([]byte, 5)
+	buff := make([]byte, 5+TokenSize)
 
-	if _, err := io.ReadFull(conn, header); err != nil {
+	if _, err := io.ReadFull(conn, buff); err != nil {
 		return nil, fmt.Errorf("read header failed: %w", err)
 	}
 
 	h := &Header{
-		Magic:   binary.BigEndian.Uint16(header[:2]),
-		Version: header[2],
-		Opcode:  binary.BigEndian.Uint16(header[3:5]),
+		Magic:   binary.BigEndian.Uint16(buff[:2]),
+		Version: buff[2],
+		Opcode:  binary.BigEndian.Uint16(buff[3:5]),
+		Token:   strings.TrimRight(string(buff[5:]), "\x00"),
 	}
 
 	if h.Magic != MagicValue {
-		return nil, fmt.Errorf("invalid magic: 0x%X", h.Magic)
+		return nil, ErrMagic
 	}
-
-	tokenRaw := make([]byte, TokenSize)
-	if _, err := io.ReadFull(conn, tokenRaw); err != nil {
-		return nil, fmt.Errorf("read token failed: %w", err)
+	if h.Version != VersionV1 {
+		return nil, ErrVersion
 	}
-
-	h.Token = strings.TrimRight(string(tokenRaw), "\x00")
 
 	return h, nil
 }

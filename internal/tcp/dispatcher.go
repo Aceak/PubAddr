@@ -13,7 +13,8 @@ type Dispatcher struct {
 }
 
 func NewDispatcher() *Dispatcher {
-	return &Dispatcher{handlers: make(map[uint8]VersionHandler)}
+	dispatcher := &Dispatcher{handlers: make(map[uint8]VersionHandler)}
+	return dispatcher
 }
 
 func (d *Dispatcher) Register(version uint8, handler VersionHandler) {

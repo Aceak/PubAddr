@@ -1,6 +1,7 @@
 package tcp
 
 import (
+	"encoding/binary"
 	"net"
 	"time"
 )
@@ -24,28 +25,52 @@ func (h *V1Handler) Handle(conn net.Conn, header *Header, server *TCPServer) err
 
 func (s *TCPServer) HandleIPv4(conn net.Conn, header *Header) error {
 
-	ip := extractIP(conn.RemoteAddr().String())
-	if ip == "" {
+	ipStr, err := extractIP(conn.RemoteAddr().String())
+	if err != nil {
+		writeResponse(conn, StatusServerError, nil)
+		return err
+	}
+
+	ip := net.ParseIP(ipStr).To4()
+	if ip == nil {
+		writeResponse(conn, StatusServerError, nil)
+		return ErrInvalidIP
+	}
+
+	hasToken := header.Token != ""
+	if !s.rateLimiter.Allow(ipStr, hasToken, header.Token) {
+		writeResponse(conn, StatusRateLimited, nil)
 		return nil
 	}
 
-	token := header.Token
-	hasToken := len(token) > 0
-
-	if !s.rateLimiter.Allow(ip, hasToken, token) {
-		return nil // 超限 → 直接断开，不输出
-	}
-
 	_ = conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
-	_, _ = conn.Write([]byte(ip + "\n"))
-	return nil
+	return writeResponse(conn, StatusOK, ip)
 }
 
-func extractIP(remote string) string {
+func extractIP(remote string) (string, error) {
 	for i := len(remote) - 1; i >= 0; i-- {
 		if remote[i] == ':' {
-			return remote[:i]
+			return remote[:i], nil
 		}
 	}
-	return ""
+	return "", ErrInvalidIP
+}
+
+func writeResponse(conn net.Conn, status uint8, ip net.IP) error {
+	buff := make([]byte, ResponseSize)
+
+	binary.BigEndian.PutUint16(buff[:2], MagicValue)
+	buff[2] = VersionV1
+	buff[3] = status
+
+	if status == StatusOK && ip != nil {
+		ip4 := ip.To4()
+		if ip4 == nil {
+			return writeResponse(conn, StatusServerError, nil)
+		}
+		copy(buff[4:8], ip4)
+	}
+
+	_, err := conn.Write(buff)
+	return err
 }
