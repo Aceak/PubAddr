@@ -1,10 +1,9 @@
-package server
+package httpserver
 
 import (
-	"PubAddr/internal/config"
-	"PubAddr/internal/limit"
-	"PubAddr/internal/logger"
-	"PubAddr/internal/service"
+	"github.com/Aceak/PubAddr/internal/config"
+	"github.com/Aceak/PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/service"
 	"net/http"
 	"strings"
 )
@@ -13,10 +12,10 @@ type Middleware func(http.Handler) http.Handler
 
 type MiddlewareManager struct {
 	cfg     *config.Config
-	limiter *limit.Limiter
+	limiter *Limiter
 }
 
-func NewMiddlewareManager(cfg *config.Config, limiter *limit.Limiter) *MiddlewareManager {
+func NewMiddlewareManager(cfg *config.Config, limiter *Limiter) *MiddlewareManager {
 	logger.Debug("Initializing middleware manager")
 	return &MiddlewareManager{
 		cfg:     cfg,

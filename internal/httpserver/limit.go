@@ -1,7 +1,7 @@
-package limit
+package httpserver
 
 import (
-	"PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/logger"
 	"sync"
 	"time"
 )

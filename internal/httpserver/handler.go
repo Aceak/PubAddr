@@ -1,9 +1,9 @@
-package server
+package httpserver
 
 import (
-	"PubAddr/internal/config"
-	"PubAddr/internal/logger"
-	"PubAddr/internal/service"
+	"github.com/Aceak/PubAddr/internal/config"
+	"github.com/Aceak/PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/service"
 	"net/http"
 )
 

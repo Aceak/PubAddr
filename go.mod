@@ -1,4 +1,4 @@
-module PubAddr
+module github.com/Aceak/PubAddr
 
 go 1.24.3
 

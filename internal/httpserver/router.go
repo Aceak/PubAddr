@@ -1,7 +1,7 @@
-package server
+package httpserver
 
 import (
-	"PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/logger"
 	"net/http"
 )
 

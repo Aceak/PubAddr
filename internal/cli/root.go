@@ -1,13 +1,13 @@
 package cli
 
 import (
-	"PubAddr/internal/config"
-	"PubAddr/internal/logger"
-	"PubAddr/internal/server"
-	"PubAddr/internal/tcp"
-	"PubAddr/internal/version"
 	"context"
 	"fmt"
+	"github.com/Aceak/PubAddr/internal/config"
+	"github.com/Aceak/PubAddr/internal/httpserver"
+	"github.com/Aceak/PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/tcp"
+	"github.com/Aceak/PubAddr/internal/version"
 	"net/http"
 	"os"
 	"os/signal"
@@ -63,7 +63,7 @@ func run() {
 
 	logger.SetLevel(cfg.Server.LogLevel)
 
-	httpSrv, err := server.NewHTTPServer(cfg)
+	httpSrv, err := httpserver.NewHTTPServer(cfg)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP server: %v", err)
 	}

@@ -1,4 +1,4 @@
-package server
+package httpserver
 
 func registerRoutes(r *Router, h *Handler, mm *MiddlewareManager) {
 	r.GET("/", h.handleGetIP, mm.UABlock, mm.RateLimit)

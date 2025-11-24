@@ -1,7 +1,7 @@
 package main
 
 import (
-	"PubAddr/internal/cli"
+	"github.com/Aceak/PubAddr/internal/cli"
 )
 
 func main() {

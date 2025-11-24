@@ -1,13 +1,12 @@
-package server
+package httpserver
 
 import (
 	"context"
 	"net"
 	"net/http"
 
-	"PubAddr/internal/config"
-	"PubAddr/internal/limit"
-	"PubAddr/internal/logger"
+	"github.com/Aceak/PubAddr/internal/config"
+	"github.com/Aceak/PubAddr/internal/logger"
 )
 
 type HTTPServer struct {
@@ -17,9 +16,9 @@ type HTTPServer struct {
 
 func NewHTTPServer(cfg *config.Config) (*HTTPServer, error) {
 	logger.Debug("Initializing HTTP server on %s", cfg.Server.Addr)
-	r := NewRouter()                                                             // 创建路由器
-	h := NewHandler(cfg)                                                         // 初始化 handler
-	mm := NewMiddlewareManager(cfg, limit.NewLimiter(cfg.Security.RateDuration)) // 初始化中间件管理器
+	r := NewRouter()                                                       // 创建路由器
+	h := NewHandler(cfg)                                                   // 初始化 handler
+	mm := NewMiddlewareManager(cfg, NewLimiter(cfg.Security.RateDuration)) // 初始化中间件管理器
 	logger.Debug("Registering routes")
 	registerRoutes(r, h, mm) // 自动注册路由
 
