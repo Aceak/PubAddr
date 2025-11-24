@@ -1,7 +1,7 @@
 package tcp
 
 import (
-	"github.com/Aceak/PubAddr/internal/logger"
+	"PubAddr/internal/logger"
 	"sync"
 	"time"
 )

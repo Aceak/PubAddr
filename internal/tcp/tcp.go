@@ -1,9 +1,9 @@
 package tcp
 
 import (
+	"PubAddr/internal/config"
+	"PubAddr/internal/logger"
 	"context"
-	"github.com/Aceak/PubAddr/internal/config"
-	"github.com/Aceak/PubAddr/internal/logger"
 	"net"
 	"time"
 )

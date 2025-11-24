@@ -5,8 +5,8 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/Aceak/PubAddr/internal/config"
-	"github.com/Aceak/PubAddr/internal/logger"
+	"PubAddr/internal/config"
+	"PubAddr/internal/logger"
 )
 
 type HTTPServer struct {

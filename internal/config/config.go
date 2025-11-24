@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Aceak/PubAddr/internal/logger"
+	"PubAddr/internal/logger"
 	"gopkg.in/yaml.v3"
 )
 
