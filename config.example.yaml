@@ -1,5 +1,7 @@
 server:
   addr: ":8080"
+  tcp_enable: true
+  tcp_addr: ":8081"
   log_level: "debug"
 
 ip_header:

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"net"
 	"net/http"
 
 	"PubAddr/internal/config"
@@ -10,7 +11,8 @@ import (
 )
 
 type HTTPServer struct {
-	srv *http.Server
+	srv      *http.Server
+	listener net.Listener
 }
 
 func NewHTTPServer(cfg *config.Config) (*HTTPServer, error) {
@@ -32,11 +34,24 @@ func NewHTTPServer(cfg *config.Config) (*HTTPServer, error) {
 }
 
 func (s *HTTPServer) Start() error {
-	logger.Info("HTTP server listening on %s", s.srv.Addr)
-	return s.srv.ListenAndServe() // 纯 HTTP，无 TLS
+	ln, err := net.Listen("tcp4", s.srv.Addr)
+	if err != nil {
+		return err
+	}
+	s.listener = ln
+
+	logger.Info("HTTP server started on %s", ln.Addr().String())
+	return s.srv.Serve(ln)
 }
 
 func (s *HTTPServer) Shutdown(ctx context.Context) error {
 	logger.Info("Shutting down HTTP server...")
 	return s.srv.Shutdown(ctx)
+}
+
+func (s *HTTPServer) Addr() string {
+	if s.listener != nil {
+		return s.listener.Addr().String()
+	}
+	return s.srv.Addr
 }

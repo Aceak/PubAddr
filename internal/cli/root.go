@@ -4,6 +4,7 @@ import (
 	"PubAddr/internal/config"
 	"PubAddr/internal/logger"
 	"PubAddr/internal/server"
+	"PubAddr/internal/tcp"
 	"PubAddr/internal/version"
 	"context"
 	"fmt"
@@ -62,19 +63,38 @@ func run() {
 
 	logger.SetLevel(cfg.Server.LogLevel)
 
-	srv, err := server.NewHTTPServer(cfg)
+	httpSrv, err := server.NewHTTPServer(cfg)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP server: %v", err)
+	}
+
+	var tcpSrv *tcp.TCPServer
+	if cfg.Server.EnableTCP {
+		tcpSrv, err = tcp.NewTCPServer(cfg)
+		if err != nil {
+			logger.Fatal("Failed to create TCP server: %v", err)
+		}
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	go func() {
-		if err := srv.Start(); err != nil && err != http.ErrServerClosed {
+		err := httpSrv.Start()
+		if err != nil && err != http.ErrServerClosed {
 			logger.Error("HTTP server error: %v", err)
+			return
 		}
 	}()
+
+	if tcpSrv != nil {
+		go func() {
+			if err := tcpSrv.Start(); err != nil {
+				logger.Error("TCP server error: %v", err)
+				return
+			}
+		}()
+	}
 
 	<-ctx.Done()
 	logger.Debug("Received shutdown signal...")
@@ -82,7 +102,13 @@ func run() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		logger.Error("Shutdown unexpectly: %v", err)
+	if err := httpSrv.Shutdown(shutdownCtx); err != nil {
+		logger.Error(" HTTP service shutdown unexpectly: %v", err)
+	}
+
+	if tcpSrv != nil {
+		if err := tcpSrv.Close(); err != nil {
+			logger.Error("TCP service shutdown unexpectly: %v", err)
+		}
 	}
 }

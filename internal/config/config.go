@@ -9,8 +9,10 @@ import (
 )
 
 type ServerConfig struct {
-	Addr     string `yaml:"addr"`
-	LogLevel string `yaml:"log_level"`
+	Addr      string `yaml:"addr"`
+	EnableTCP bool   `yaml:"enable_tcp"`
+	TCPAddr   string `yaml:"tcp_addr"`
+	LogLevel  string `yaml:"log_level"`
 }
 
 type IPHeaderConfig struct {
