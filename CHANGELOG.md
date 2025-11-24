@@ -2,37 +2,37 @@
 
 ## v0.2.0 (2025-11-24)
 
-### 🆕 新特性 | New Features
+### 🆕 New Features | 新特性
 
-- **TCP 服务支持 | TCP Service Support**
-  - 新增TCP协议支持，提供更轻量的IP查询接口
+- **TCP Service Support | TCP 服务支持**
   - Added TCP protocol support for lightweight IP querying
+  - 新增TCP协议支持，提供更轻量的IP查询接口
 
-- **TCP SDK 客户端 | TCP SDK Client**
-  - 提供了用于连接TCP服务的客户端SDK
+- **TCP SDK Client | TCP SDK 客户端**
   - Provided client SDK for connecting to TCP service
+  - 提供了用于连接TCP服务的客户端SDK
 
-- **增强的访问控制 | Enhanced Access Control**
-  - 支持基于令牌(Token)的TCP服务认证
+- **Enhanced Access Control | 增强的访问控制**
   - Support for token-based authentication in TCP service
+  - 支持基于令牌(Token)的TCP服务认证
 
-### 🔧 改进 | Improvements
+### 🔧 Improvements | 改进
 
-- **优化的限流机制 | Optimized Rate Limiting**
-  - 为TCP服务实现了专门的限流策略
+- **Optimized Rate Limiting | 优化的限流机制**
   - Implemented specialized rate limiting for TCP service
+  - 为TCP服务实现了专门的限流策略
 
-- **日志系统增强 | Enhanced Logging**
-  - 支持运行时动态调整日志级别
+- **Enhanced Logging | 日志系统增强**
   - Added support for runtime log level adjustment
+  - 支持运行时动态调整日志级别
 
-- **配置项扩展 | Extended Configuration**
-  - 添加TCP相关配置：`enable_tcp`和`tcp_addr`
+- **Extended Configuration | 配置项扩展**
   - Added TCP-related configurations: `enable_tcp` and `tcp_addr`
+  - 添加TCP相关配置：`enable_tcp`和`tcp_addr`
 
-- **构建系统优化 | Build System Optimization**
-  - 改进跨平台构建脚本，支持更多架构
+- **Build System Optimization | 构建系统优化**
   - Improved cross-platform build script with support for more architectures
+  - 改进跨平台构建脚本，支持更多架构
 
 ## v0.1.0 (2025-11-18)
 
